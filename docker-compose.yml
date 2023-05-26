@@ -1,0 +1,27 @@
+# https://velog.io/@yh20studio/Docker-Django-Nginx-uwsgi-%EB%A1%9C%EC%BB%AC%EC%84%9C%EB%B2%84%EC%97%90%EC%84%9C-%EB%B0%B0%ED%8F%AC-%EC%A7%84%ED%96%89
+version: "3"
+services:
+  django-web:
+    # Django 웹 애플리케이션 컨테이너 설정
+    container_name: django-web
+    image: Django
+    ports:
+      - "8000:8000"
+    build: ./django
+    volumes: 
+      - ./Ubuntu_01:/srv/letter_web # 호스트와 컨테이너 간의 디렉토리 공유 설정
+      - ./log/uwsgi:/log # 로그 디렉토리 공유 설정
+
+  # Nginx 웹 서버 컨테이너 설정
+  nginx:
+    container_name: nginx
+    image: nginx
+    ports:
+      - "80:80"
+    build: ./nginx
+    volumes:
+      - ./Ubuntu_01:/srv/letter_web # 호스트와 컨테이너 간의 디렉토리 공유 설정
+      - ./log/nginx:/log # 로그 디렉토리 공유 설정
+      - ./.static_root:/static # 정적 파일 디렉토리 공유 설정
+    depends_on : 
+      - django-web # Django 웹 애플리케이션 컨테이너가 먼저 실행되도록 설정
